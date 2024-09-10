@@ -1,4 +1,3 @@
-//Collaborator: Casey Morris
 #define _POSIX_C_SOURCE 200809L
 #include <errno.h>
 #include <limits.h>
@@ -20,16 +19,6 @@
  *  Builtins use pseudo-redirection to avoid accidentally changing
  *  the shell's actual open files. This is implemented as a virtual
  *  layer (pseudo-fds) on top of the existing file descriptor system.
- *
- * It's very complex--don't worry if you don't understand. Just know
- * that builtins need to write to std streams with,
- *
- * dprintf(get_pseudo_fd(redir_list, STDOUT_FILENO), ...)
- * dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), ...)
- *
- * in order to work properly. That's it!
- *
- * XXX DO NOT MODIFY XXX
  */
 static int
 get_pseudo_fd(struct builtin_redir const *redir_list, int fd)
@@ -41,13 +30,10 @@ get_pseudo_fd(struct builtin_redir const *redir_list, int fd)
   return fd;
 }
 
-/** do nothing
- *
+/**
  *  This function exists to solve the edge case of
  *  a command that consists only of redirections
  *  and assignments.
- *
- *  XXX DO NOT MODIFY XXX
  */
 static int
 builtin_null(struct command *cmd, struct builtin_redir const *redir_list)
@@ -56,17 +42,10 @@ builtin_null(struct command *cmd, struct builtin_redir const *redir_list)
 }
 
 /* change directory
- *
  * @returns 0 on success, -1 on error
- *
  * cd [path]
- *
  * if path is omitted, change to $HOME directory.
- *
  * Updates $PWD shell variable
- *
- * It is an error if too many arguments are provided, or if the chdir operation
- * fails
  */
 static int
 builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
@@ -75,16 +54,8 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
   if (cmd->word_count == 1) {
     target_dir = vars_get("HOME");
     if (!target_dir) {
-      /* XXX Notice instead of printing to the REAL stderr, we print to the
-       * pseudo-redirected stderr, using dprintf and the get_pseudo_fd function
-       *
-       * This is how builtins do redirections as virtual a layer on top of
-       * existing open files without closing any existing files, so that the
-       * shell doesn't get messed up after the builtin executes.
-       *
-       * It's not important for you to wrap your head around it right now, just
-       * know to use this type of print statement in your builtins for the
-       * correct behavior. :)
+      /* print to the pseudo-redirected stderr,
+       * using dprintf and the get_pseudo_fd function
        */
       dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "cd: HOME not set\n");
       return -1;
@@ -96,7 +67,7 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
     return -1;
   }
 
-  /*TODO: Implement cd with arguments 
+  /*Implementing cd with arguments 
    */
   chdir(target_dir);
   setenv("PWD", target_dir, 1);
@@ -119,7 +90,7 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
 static int
 builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
 {
-  /* TODO: Set params.status to the appropriate value before exiting */
+  /* Set params.status to the appropriate value before exiting */
   if (cmd->word_count == 2) {
     char *endptr;
     long status = strtol(cmd->words[1], &endptr, 10);
@@ -141,8 +112,6 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
  * @returns 0 on success, -1 on failure
  *
  * export name[=value]...
- *
- * XXX DO NOT MODIFY XXX
  */
 static int
 builtin_export(struct command *cmd, struct builtin_redir const *redir_list)
@@ -172,15 +141,13 @@ static int
 builtin_unset(struct command *cmd, struct builtin_redir const *redir_list)
 {
   for (size_t i = 1; i < cmd->word_count; ++i) {
-    /* TODO: Unset variables */
+    /* Unset variables */
     vars_unset(cmd->words[i]);
   }
   return 0;
 }
 
 /** Places the specified (backround) job in the foreground
- *
- * XXX DO NOT MODIFY XXX
  */
 static int
 builtin_fg(struct command *cmd, struct builtin_redir const *redir_list)
@@ -228,8 +195,6 @@ err:
 }
 
 /** places a (stopped) bg process in the background
- *
- * XXX DO NOT MODIFY XXX
  */
 static int
 builtin_bg(struct command *cmd, struct builtin_redir const *redir_list)
@@ -274,8 +239,6 @@ err:
 /** prints a list of background jobs
  *
  * @returns 0 (always succeeds)
- *
- * XXX DO NOT MODIFY XXX
  */
 static int
 builtin_jobs(struct command *cmd, struct builtin_redir const *redir_list)
