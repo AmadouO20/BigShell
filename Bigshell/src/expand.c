@@ -1,7 +1,7 @@
-/* XXX DO NOT MODIFY THIS FILE XXX
+/* 
  *
  * This code handles all variable and other expansions that a shell is supposed
- * to do, for you. Refer to expand.h for the interface.
+ * to do.
  *
  */
 #define _POSIX_C_SOURCE 200809L
@@ -244,7 +244,6 @@ remove_prefix(char const *s, char const *pre)
   return (char *)s;
 }
 
-/* XXX DO NOT MODIFY */
 char *
 expand_prompt(char **prompt)
 {
@@ -259,7 +258,6 @@ expand_prompt(char **prompt)
         break;
       case 'd':
       case 'D':
-        /* Not implemented */
         break;
       case 'e':
         p = expand_substr(prompt, &start, &stop, "\033");
