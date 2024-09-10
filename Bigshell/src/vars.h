@@ -1,4 +1,3 @@
-/* XXX DO NOT MODIFY THIS FILE XXX */
 #pragma once
 /** @file Shell variables */
 

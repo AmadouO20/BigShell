@@ -1,4 +1,3 @@
-//Collaborator: Casey Morris
 #define _POSIX_C_SOURCE 200809L
 #include <assert.h>
 #include <err.h>
@@ -17,14 +16,14 @@ wait_on_fg_gid(pid_t pgid)
 {
   if (pgid < 0) return -1;
   /* Make sure the foreground group is running */
-  /* TODO send the "continue" signal to the process group 'pgid'
-   * XXX review kill(2)
+  /* send the "continue" signal to the process group 'pgid'
+   * XXX kill(2)
    */
     kill(-pgid, SIGCONT);
 
   if (isatty(STDIN_FILENO)) {
-    /* TODO make 'pgid' the foreground process group
-     * XXX review tcsetpgrp(3) */
+    /* make 'pgid' the foreground process group
+     * XXX tcsetpgrp(3) */
     tcsetpgrp(STDIN_FILENO, pgid); 
   } else {
     switch (errno) {
@@ -47,8 +46,6 @@ wait_on_fg_gid(pid_t pgid)
 
   /* XXX Notice here we loop until ECHILD and we use the status of
    * the last child process that terminated (in the previous iteration).
-   * Consider a pipeline,
-   *        cmd1 | cmd2 | cmd3
    *
    * We will loop exactly 4 times, once for each child process, and a
    * fourth time to see ECHILD.
@@ -57,7 +54,7 @@ wait_on_fg_gid(pid_t pgid)
   for (;;) {
     /* Wait on ALL processes in the process group 'pgid' */
     int status;
-    pid_t res = waitpid(/* TODO */ -pgid, &status, WUNTRACED);
+    pid_t res = waitpid(-pgid, &status, WUNTRACED);
     if (res < 0) {
       /* Error occurred (some errors are ok, see below)
        *
@@ -67,14 +64,14 @@ wait_on_fg_gid(pid_t pgid)
         /* No unwaited-for children. The job is done! */
         errno = 0;
         if (WIFEXITED(last_status)) {
-          /* TODO set params.status to the correct value */
+          /* set params.status to the correct value */
           params.status = WEXITSTATUS(last_status);
         } else if (WIFSIGNALED(last_status)) {
-          /* TODO set params.status to the correct value */
+          /* set params.status to the correct value */
           params.status = WTERMSIG(last_status) + 128;
         }
 
-        /* TODO remove the job for this group from the job list
+        /* remove the job for this group from the job list
          *  see jobs.h
          */
         jobs_remove_gid(pgid);
@@ -88,10 +85,10 @@ wait_on_fg_gid(pid_t pgid)
     /* Record status for reporting later */
     last_status = status;
 
-    /* TODO handle case where a child process is stopped
+    /* handle case where a child process is stopped
      *  The entire process group is placed in the background
      */
-    if (/* TODO */ WIFSTOPPED(status)) {
+    if (WIFSTOPPED(status)) {
       fprintf(stderr, "[%jd] Stopped\n", (intmax_t)jobs_get_jid(pgid));
       goto out;
     }
@@ -106,11 +103,10 @@ err:
   }
 
   if (isatty(STDIN_FILENO)) {
-    /* TODO make bigshell the foreground process group again
-     * XXX review tcsetpgrp(3) 
+    /* make bigshell the foreground process group again
+     * XXX tcsetpgrp(3) 
      *
      * Note: this will cause bigshell to receive a SIGTTOU signal.
-     *       You need to also finish signal.c to have full functionality here
      */
     tcsetpgrp(STDIN_FILENO, getpgrp());
   } else {
@@ -125,7 +121,6 @@ err:
   return retval;
 }
 
-/* XXX DO NOT MODIFY XXX */
 int
 wait_on_fg_job(jid_t jid)
 {
@@ -144,7 +139,7 @@ wait_on_bg_jobs()
     jid_t jid = jobs[i].jid;
     int last_status = 0;
     for (;;) {
-      /* TODO: Modify the following line to wait for process group
+      /* Modify the following line to wait for process group
        * XXX make sure to do a nonblocking wait!
        */
       int status;

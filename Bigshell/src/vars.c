@@ -1,4 +1,3 @@
-//Collaborator: Casey Morris
 #define _POSIX_C_SOURCE 200809L
 #include <assert.h>
 #include <ctype.h>
@@ -32,14 +31,6 @@ static int
 is_valid_varname(char const *name)
 {
   assert(name);
-  /* TODO: Implement me.
-   * Refer to:
-   *  3.230 Name. Base Definitions. POSIX.1-2008
-   *  regex to match: [A-Za-z_][A-Za-z0-9_]*
-   *
-   * You'll most definitely want to use functions from: ctype.h(0P)
-   */
-  /* Not implemented */
   if (!isalpha((unsigned char)*name) && *name != '_') {
     return 0;
   }
@@ -61,7 +52,7 @@ is_valid_varname(char const *name)
 int
 vars_is_valid_varname(char const *name)
 {
-  /* TODO: Implement argument validation before tail-calling internal
+  /* Implemented argument validation before tail-calling internal
    * is_valid_varname() function. */
   if (name == NULL) {
     return 0;
@@ -70,8 +61,7 @@ vars_is_valid_varname(char const *name)
 }
 
 /** returns nullptr if not found 
- *
- * XXX DO NOT MODIFY XXX 
+ * 
  */
 static struct var *
 find_var(char const *name)
@@ -90,7 +80,6 @@ find_var(char const *name)
 
 /** Creates a new var with name and inserts into var list 
  *
- * XXX DO NOT MODIFY XXX 
  */
 static struct var *
 new_var(char const *name)
@@ -115,7 +104,6 @@ new_var(char const *name)
 
 /** Remove a var from varlist and return it 
  *
- * XXX DO NOT MODIFY XXX 
  */
 static void
 remove_var(char const *name)
@@ -134,8 +122,6 @@ remove_var(char const *name)
 }
 
 /** Return existing var, or make a new var
- *
- * XXX DO NOT MODIFY XXX 
  */
 static struct var *
 ensure_var(char const *name)
@@ -145,7 +131,6 @@ ensure_var(char const *name)
   return v ? v : new_var(name);
 }
 
-/* XXX DO NOT MODIFY XXX */
 int
 vars_set(char const *name, char const *value)
 {
@@ -169,7 +154,6 @@ vars_set(char const *name, char const *value)
   return 0;
 }
 
-/* XXX DO NOT MODIFY XXX */
 char const *
 vars_get(char const *name)
 {
@@ -199,7 +183,6 @@ vars_get(char const *name)
   return value;
 }
 
-/* XXX DO NOT MODIFY XXX */
 int
 vars_unset(char const *name)
 {
@@ -212,7 +195,6 @@ vars_unset(char const *name)
   return unsetenv(name);
 }
 
-/* XXX DO NOT MODIFY XXX */
 int
 vars_export(char const *name)
 {
@@ -237,7 +219,6 @@ vars_export(char const *name)
   return 0;
 }
 
-/* XXX DO NOT MODIFY XXX */
 void
 vars_cleanup(void)
 {

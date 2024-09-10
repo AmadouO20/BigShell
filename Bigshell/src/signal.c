@@ -1,4 +1,3 @@
-//Collaborator: Casey Morris
 #define _POSIX_C_SOURCE 200809L
 #include <signal.h>
 #include <errno.h>
@@ -35,7 +34,7 @@ static struct sigaction ignore_action = {.sa_handler = SIG_IGN},
 int
 signal_init(void)
 {
-  /* TODO Initialize signals, store old actions 
+  /* Initialize signals, store old actions 
    *
    * e.g. sigaction(SIGNUM, &new_handler, &saved_old_handler);
    *
@@ -46,7 +45,6 @@ signal_init(void)
 	  return -1;
   }
   return 0;
- /* not implemented */
 }
 
 /** enable signal to interrupt blocking syscalls (read/getline, etc) 
@@ -58,10 +56,10 @@ signal_init(void)
 int
 signal_enable_interrupt(int sig)
 {
-  /* TODO set the signal disposition for signal to interrupt  */
+  /* set the signal disposition for signal to interrupt  */
   if (sigaction(sig, &interrupt_action, 0) < 0) {
     return -1;
-  } /* not implemented */
+  }
   return 0;
 }
 
@@ -74,9 +72,9 @@ signal_enable_interrupt(int sig)
 int
 signal_ignore(int sig)
 {
-  /* TODO set the signal disposition for signal back to its old state */
+  /* set the signal disposition for signal back to its old state */
   if (sigaction(sig, &ignore_action, 0) < 0) {
-    return -1; /* not implemented */
+    return -1;
   }
   return 0;
 }
@@ -89,12 +87,11 @@ signal_ignore(int sig)
 int
 signal_restore(void)
 {
-  /* TODO restore old actions 
+  /* restore old actions 
    *
    * e.g. sigaction(SIGNUM, &saved_old_handler, NULL);
    *
    * */
-  /* not implemented */
   if (sigaction(SIGTSTP, &old_sigtstp, 0) < 0 || sigaction(SIGINT, &old_sigint, 0) < 0 || sigaction(SIGTTOU, &old_sigttou, 0) < 0) {
 	  return -1;
   }
