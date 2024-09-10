@@ -1,4 +1,3 @@
-/* XXX DO NOT MODIFY THIS FILE XXX */
 #include <stdlib.h>
 #include <string.h>
 
