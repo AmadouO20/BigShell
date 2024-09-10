@@ -1,4 +1,3 @@
-/* XXX DO NOT MODIFY XXX */
 #pragma once
 #include "parser.h"
 

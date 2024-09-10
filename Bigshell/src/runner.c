@@ -1,4 +1,3 @@
-//Collaborator: Casey Morris
 #define _POSIX_C_SOURCE 200809L
 #include <assert.h>
 #include <err.h>
@@ -43,11 +42,11 @@ expand_command_words(struct command *cmd)
   for (size_t i = 0; i < cmd->word_count; ++i) {
     expand(&cmd->words[i]);
   }
-  /* TODO Assignment values */
+  /* Assignment values */
   for (size_t i = 0; i < cmd->assignment_count; ++i) {
     expand(&cmd->assignments[i]->value);
   }
-  /* TODO I/O Filenames */
+  /* I/O Filenames */
   for (size_t i = 0; i < cmd->io_redir_count; ++i) {
     expand(&cmd->io_redirs[i]->filename);
   }
@@ -67,8 +66,8 @@ do_variable_assignment(struct command const *cmd, int export_all)
 {
   for (size_t i = 0; i < cmd->assignment_count; ++i) {
     struct assignment *a = cmd->assignments[i];
-    /* TODO Assign */
-    /* TODO Export (if export_all != 0) */
+    /* Assign */
+    /* Export (if export_all != 0) */
     vars_set(a->name, a->value);
     if (export_all != 0) vars_export(a->name);
   }
@@ -79,7 +78,7 @@ static int
 get_io_flags(enum io_operator io_op)
 {
   int flags = 0;
-  /* TODO: Each IO operator has specified behavior. Select the appropriate
+  /* Each IO operator has specified behavior. Select the appropriate
    * file flags.
    *
    * Note: labels not followed by a break statement fall through to the
@@ -110,20 +109,20 @@ get_io_flags(enum io_operator io_op)
   switch (io_op) {
     case OP_LESSAND: /* <& */
     case OP_LESS:    /* < */
-      flags = O_RDONLY;     /* TODO */
+      flags = O_RDONLY;     
       break;
     case OP_GREATAND: /* >& */
     case OP_GREAT:    /* > */
-      flags = O_WRONLY | O_CREAT | O_EXCL;      /* TODO */
+      flags = O_WRONLY | O_CREAT | O_EXCL;     
       break;
     case OP_DGREAT: /* >> */
-      flags = O_WRONLY | O_CREAT | O_APPEND;    /* TODO */
+      flags = O_WRONLY | O_CREAT | O_APPEND;   
       break;
     case OP_LESSGREAT: /* <> */
-      flags = O_RDWR | O_CREAT;       /* TODO */
+      flags = O_RDWR | O_CREAT;       
       break;
     case OP_CLOBBER: /* >| */
-      flags = O_WRONLY | O_CREAT | O_TRUNC;     /* TODO */
+      flags = O_WRONLY | O_CREAT | O_TRUNC;     
       break;
   }
   return flags;
@@ -143,8 +142,8 @@ static int
 move_fd(int src, int dst)
 {
   if (src == dst) return dst;
-  /* TODO move src to dst */
-  /* TODO close src */
+  /* move src to dst */
+  /* close src */
   dup2(src, dst);
   close(src);
   return dst;
@@ -167,10 +166,6 @@ move_fd(int src, int dst)
  * separate child processes--they are just functions that are a part of the
  * shell itself.
  *
- * This is, of course, very complicated, and not something you're expected to
- * wrap your head around. You can ignore this function entirely.
- *
- * XXX DO NOT MODIFY XXX
  */
 static int
 do_builtin_io_redirects(struct command *cmd, struct builtin_redir **redir_list)
@@ -205,7 +200,7 @@ do_builtin_io_redirects(struct command *cmd, struct builtin_redir **redir_list)
       } else {
         /* The filename is interpreted as a file descriptor number to
          * redirect to. For example, 2>&1 duplicates file descriptor 1
-         * onto file descriptor 2 (yes, it feels backwards). */
+         * onto file descriptor 2 */
         char *end = r->filename;
         long src = strtol(r->filename, &end, 10);
 
@@ -240,7 +235,7 @@ do_builtin_io_redirects(struct command *cmd, struct builtin_redir **redir_list)
     file_open:;
       int flags = get_io_flags(r->io_op);
       gprintf("attempting to open file %s with flags %d", r->filename, flags);
-      /* TODO Open the specified file. */
+      /* Open the specified file. */
       int fd = open(r->filename, flags, 0777);
       if (fd < 0) goto err;
       struct builtin_redir *rec = *redir_list;
@@ -276,7 +271,6 @@ do_builtin_io_redirects(struct command *cmd, struct builtin_redir **redir_list)
  * will only ever happen in forked child processes--and can't affect the shell
  * itself. Iterate over the list of redirections and apply each one in sequence.
  *
- * TODO
  */
 static int
 do_io_redirects(struct command *cmd)
@@ -292,9 +286,8 @@ do_io_redirects(struct command *cmd)
 
       if (strcmp(r->filename, "-") == 0) {
         /* [n]>&- and [n]<&- close file descriptor [n] */
-        /* TODO close file descriptor n.
+        /* close file descriptor n.
          *
-         * XXX What is n? Look for it in `struct io_redir->???` (parser.h)
          */
         close(r->io_number);
       } else {
@@ -304,11 +297,7 @@ do_io_redirects(struct command *cmd)
          * to the same file that 1 does. */
 
         /* XXX This is a very idiomatic method of converting
-         *     strings to numbers. Avoid atoi() and scanf(), due to
-         *     lack of error checking. Read the man page for strtol()!
-         *
-         *     You'll probably want to use this exact code again elsewhere in
-         *     this project...
+         *     strings to numbers. 
          */
         char *end = r->filename;
         long src = strtol(r->filename, &end, 10);
@@ -317,7 +306,7 @@ do_io_redirects(struct command *cmd)
             && src <= INT_MAX /* <--- this is *critical* bounds checking when
                                  downcasting */
         ) {
-          /* TODO duplicate src to dst. */
+          /* duplicate src to dst. */
         dup2(src, r->io_number);
         } else {
           /* XXX Syntax error--(not a valid number)--we can "recover" by
@@ -332,20 +321,18 @@ do_io_redirects(struct command *cmd)
     file_open:;
       int flags = get_io_flags(r->io_op);
       gprintf("attempting to open file %s with flags %d", r->filename, flags);
-      /* TODO Open the specified file with the appropriate flags and mode
+      /* Open the specified file with the appropriate flags and mode
        *
-       * XXX Note: you can supply a mode to open() even if you're not creating a
-       * file. it will just ignore that argument.
        */
 
-      /* TODO Move the opened file descriptor to the redirection target */
+      /* Move the opened file descriptor to the redirection target */
       /* XXX use move_fd() */
       int fd = open(r->filename, flags, 0777);
       if (fd < 0) goto err;
       if (move_fd(fd, r->io_number) < 0) goto err;
     }
     if (0) {
-    err: /* TODO Anything that can fail should jump here. No silent errors!!! */
+    err: /* Anything that can fail should jump here. No silent errors!!! */
       status = -1;
       perror("IO redirection Error");
     }
@@ -400,7 +387,7 @@ run_command_list(struct command_list *cl)
 
     /* IF we are a pipeline command, create a pipe for our stdout */
     if (is_pl) {
-      /* TODO create a new pipe with pipeline_fds */
+      /* create a new pipe with pipeline_fds */
       /* XXX man 2 pipe */
       pipe(pipeline_fds);
     } else {
@@ -421,7 +408,6 @@ run_command_list(struct command_list *cl)
      *   Not a builtin, OR,
      *   Is a builtin, but isn't a foreground command */
     if (!builtin || (builtin && !is_fg)) {
-      /* TODO */
       child_pid = fork();
     }
     if (child_pid == 0) {
@@ -476,8 +462,8 @@ run_command_list(struct command_list *cl)
 
         /* Redirect the two standard streams overrides IF they are not set to -1
          *   XXX This sets up pipeline redirection */
-        /* TODO move stdin_override  -> STDIN_FILENO  if stdin_override >= 0 */
-        /* TODO move stdout_override -> STDOUT_FILENO if stdin_override >= 0 */
+        /* move stdin_override  -> STDIN_FILENO  if stdin_override >= 0 */
+        /* move stdout_override -> STDOUT_FILENO if stdin_override >= 0 */
 
         /* Now handle the remaining redirect operators from the command. */
         if (stdin_override >= 0) move_fd(stdin_override, STDIN_FILENO);
@@ -492,7 +478,7 @@ run_command_list(struct command_list *cl)
         if (signal_restore() < 0) err(1, 0);
 
         /* Execute the command */
-        /* TODO execute the command described by the list of words (cmd->words).
+        /* Execute the command described by the list of words (cmd->words).
          *
          *  XXX Carefully review man 3 exec. Choose the correct function that:
          *    1) Takes an array of points to a null-terminated array of strings
@@ -516,17 +502,13 @@ run_command_list(struct command_list *cl)
 
     /* XXX initially pipeline_gid is set to 0 (unset)
      *
-     * Thoroughly read the man page for setpgid(3) and getpgid(3)
-     *
-     * What will be the effect of the following call when,
-     *
      * 1) pipeline_pgid == 0, and
      * 2) pipeline_pgid != 0
      */
     if (setpgid(child_pid, pipeline_pgid) < 0) goto err;
     if (pipeline_pgid == 0) {
       /* Start of a new pipeline */
-      assert(child_pid == getpgid(child_pid)); /* XXX How do we know this? */
+      assert(child_pid == getpgid(child_pid));
       pipeline_pgid = child_pid;
       pipeline_jid = jobs_add(pipeline_pgid);
       if (pipeline_jid < 0) goto err;
@@ -555,7 +537,7 @@ run_command_list(struct command_list *cl)
                 (intmax_t)pipeline_pgid);
       }
       params.status =
-          0; /* XXX Ignore the spec--this is correct for background jobs */
+          0; /* XXX --this is correct for background jobs */
     }
 
     /* Cleanup after non-pipeline cmds */
